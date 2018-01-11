@@ -3,10 +3,10 @@
 
 """
 playlist.py
-
+plist文件本质是xml文件，关于其具体呈现形式以及相关知识参考：https://www.jianshu.com/p/04c68bd32caa
 Description: Playing with iTunes Playlists.
-Author: Mahesh Venkitachalam
-Website: electronut.in
+Author: cuter
+Website: http://rundeep.top
 """
 
 
@@ -19,85 +19,86 @@ import numpy as np
 
 def findCommonTracks(fileNames):
     """
-    Find common tracks in given playlist files, and save them
-    to common.txt.
+    查找两个文档共同存在的音乐，保存到common.txt
     """
-    # 音轨名称
+    # 两个歌单歌名列表
     trackNameSets = []
     for fileName in fileNames:
-        # create a new set
+        # 创建一个set
         trackNames = set()
-        # read in playlist
+        # 读文件
         plist = plistlib.readPlist(fileName)
-        # get the tracks
+        # 获取歌单列表
         tracks = plist['Tracks']
-        # iterate through tracks
+        # 遍历歌单列表
         for trackId, track in tracks.items():
             try:
-                # add name to set
+                # 添加歌名到set
                 trackNames.add(track['Name'])
             except:
-                # ignore
+                # 异常忽略
                 pass
-        # add to list
+        # 添加到歌曲名称列表
         trackNameSets.append(trackNames)
-    # get set of common tracks
+    # 利用set计算重复歌曲
     commonTracks = set.intersection(*trackNameSets)
-    # write to file
+    # 写入文件
     if len(commonTracks) > 0:
         f = open("common.txt", 'wb')
         for val in commonTracks:
             s = "%s\n" % val
             f.write(s.encode("UTF-8"))
         f.close()
-        print("%d common tracks found. "
-              "Track names written to common.txt." % len(commonTracks))
+        print("发现了 %d 首重复歌曲. "
+              "歌名已经写入 common.txt." % len(commonTracks))
     else:
-        print("No common tracks!")
+        print("没发现重复歌曲!")
 
 def plotStats(fileName):
     """
-    Plot some statistics by readin track information from playlist.
+    绘制统计信息
     """
-    # read in playlist
+    # 读文件
     plist = plistlib.readPlist(fileName)
-    # get the tracks
+    # 获取歌单
     tracks = plist['Tracks']
-    # create lists of ratings and duration
+    # 分数列表和时长列表
     ratings = []
     durations = []
-    # iterate through tracks
+    # 遍历歌单
     for trackId, track in tracks.items():
         try:
             ratings.append(track['Album Rating'])
             durations.append(track['Total Time'])
         except:
-            # ignore
+            # 异常忽略
             pass
 
-    # ensure valid data was collected
+    # 检查数据有效性
     if ratings == [] or durations == []:
-        print("No valid Album Rating/Total Time data in %s." % fileName)
+        print("没有发现 分数/时长 数据 ： %s." % fileName)
         return
 
-    # cross plot
+    # 上方画图
+    # 按照int32读取时长数据
     x = np.array(durations, np.int32)
-    # convert to minutes
+    # 转换成分钟
     x = x/60000.0
+    # 读取评分
     y = np.array(ratings, np.int32)
     pyplot.subplot(2, 1, 1)
     pyplot.plot(x, y, 'o')
     pyplot.axis([0, 1.05*np.max(x), -1, 110])
-    pyplot.xlabel('Track duration')
-    pyplot.ylabel('Track rating')
+    pyplot.xlabel(u'时长')
+    pyplot.ylabel(u'评分')
 
-    # plot histogram
+    # 下方画直方图
     pyplot.subplot(2, 1, 2)
     pyplot.hist(x, bins=20)
-    pyplot.xlabel('Track duration')
-    pyplot.ylabel('Count')
+    pyplot.xlabel(u'时长')
+    pyplot.ylabel(u'数量')
 
-    # show plot
+    # 绘制
     pyplot.show()
 
 
@@ -118,29 +119,29 @@ def findDuplicates(fileName):
         try:
             name = track['Name']
             duration = track['Total Time']
-            # is there an entry already?
+            # 判断我们的列表里面是否已经有了
             if name in trackNames:
-                # if name and duration matches, increment count
-                # duration rounded to nearest second
+                # 如果歌曲名称和时长相同，计数加一
+                # 持续时长四舍五入精确到秒
                 if duration//1000 == trackNames[name][0]//1000:
                     count = trackNames[name][1]
                     trackNames[name] = (duration, count+1)
             else:
-                # add entry - duration and count
+                # 加入到我们的字典trackNames 键是歌名值是元组（时长，出现次数）
                 trackNames[name] = (duration, 1)
         except:
-            # ignore
+            # 异常忽略
             pass
-    # store duplicates as (name, count) tuples
+    # 保存重复的歌曲为元组（数量，歌名）到数组dups里面
     dups = []
     for k, v in trackNames.items():
         if v[1] > 1:
             dups.append((v[1], k))
-    # save dups to file
+    # 打印到控制台
     if len(dups) > 0:
-        print("Found %d duplicates. Track names saved to dup.txt" % len(dups))
+        print("发现 %d 首重复的. 歌曲名字 保存已到 dup.txt" % len(dups))
     else:
-        print("No duplicate tracks found!")
+        print("没发现重复歌曲!")
     f = open("dups.txt", 'w')
     for val in dups:
         f.write("[%d] %s\n" % (val[0], val[1]))
