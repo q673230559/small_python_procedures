@@ -89,13 +89,16 @@ def plotStats(fileName):
     x = x/60000.0
     # 读取评分
     y = np.array(ratings, np.int32)
+    # 整个图两行，一列 从第一行开始画
     pyplot.subplot(2, 1, 1)
+    # x轴时长，用圆圈o表示
     pyplot.plot(x, y, 'o')
+    #
     pyplot.axis([0, 1.05*np.max(x), -1, 110])
     pyplot.xlabel('时长', fontproperties=zhfont1)
     pyplot.ylabel('评分', fontproperties=zhfont1)
 
-    # 下方画直方图
+    # 下方画图
     pyplot.subplot(2, 1, 2)
     pyplot.hist(x, bins=20)
     pyplot.xlabel('时长', fontproperties=zhfont1)
