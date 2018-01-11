@@ -15,6 +15,9 @@ import sys
 from matplotlib import pyplot
 import plistlib
 import numpy as np
+import matplotlib
+# 中文楷体支持
+zhfont1 = matplotlib.font_manager.FontProperties(fname='font/simkai.ttf')
 
 
 def findCommonTracks(fileNames):
@@ -89,14 +92,14 @@ def plotStats(fileName):
     pyplot.subplot(2, 1, 1)
     pyplot.plot(x, y, 'o')
     pyplot.axis([0, 1.05*np.max(x), -1, 110])
-    pyplot.xlabel(u'时长')
-    pyplot.ylabel(u'评分')
+    pyplot.xlabel('时长', fontproperties=zhfont1)
+    pyplot.ylabel('评分', fontproperties=zhfont1)
 
     # 下方画直方图
     pyplot.subplot(2, 1, 2)
     pyplot.hist(x, bins=20)
-    pyplot.xlabel(u'时长')
-    pyplot.ylabel(u'数量')
+    pyplot.xlabel('时长', fontproperties=zhfont1)
+    pyplot.ylabel('数量', fontproperties=zhfont1)
 
     # 绘制
     pyplot.show()

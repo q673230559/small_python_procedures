@@ -1,6 +1,6 @@
 # 使用说明
 ## 环境
-- 安装Anaconda2 python 2.7.13
+- 安装Anaconda3 python 3.6.3
 - Anaconda2默认库已经包含所需库
 - plistlib库 用于解析plist格式文件
 - matplotlib库 用于绘图
